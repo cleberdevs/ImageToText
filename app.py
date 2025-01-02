@@ -41,7 +41,7 @@ def index():
             # Extrai o texto da imagem
             try:
                 texto = extrair_texto_da_imagem(image_path)
-                texto_total += texto + "\n"  # Adiciona o texto ao total
+                texto_total += texto + "\n\n"  # Adiciona o texto ao total com 2 quebras de linha
             except Exception as e:
                 return f"Erro ao extrair texto da imagem {file.filename}: {e}", 500
 
@@ -54,19 +54,16 @@ def index():
 
     return render_template("index.html")
 
-# Função para extrair texto da imagem e colocar em uma única linha com quebras no ponto final
+# Função para extrair texto da imagem e colocar em uma única linha
 def extrair_texto_da_imagem(caminho_imagem):
     imagem = Image.open(caminho_imagem)
     # Usa o image_to_string para extrair o texto
     texto = pytesseract.image_to_string(imagem, lang='por', config='--psm 6')
 
-    # Concatena o texto em uma única linha, adicionando quebras no ponto final
+    # Concatena o texto em uma única linha
     texto_formatado = ""
     for linha in texto.split("\n"):
         texto_formatado += linha.strip() + " "
-
-    # Substitui pontos finais por ponto final + quebra de linha
-    texto_formatado = texto_formatado.replace(". ", ".\n")
 
     return texto_formatado.strip()
 
