@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, send_file
 from PIL import Image
 import pytesseract
-from docx import Document
 import os
+
+app = Flask(__name__)
 
 # Configura a variável de ambiente para o Tesseract
 os.environ['TESSDATA_PREFIX'] = '/usr/share/tesseract-ocr/4.00/tessdata/'
-
-app = Flask(__name__)
 
 # Configura o caminho do Tesseract
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
@@ -41,28 +40,35 @@ def index():
         except Exception as e:
             return f"Erro ao extrair texto da imagem: {e}", 500
 
-        # Cria o arquivo Word
-        word_path = os.path.join(UPLOAD_FOLDER, "output.docx")
-        criar_novo_arquivo_word(word_path, texto)
+        # Cria o arquivo TXT
+        txt_path = os.path.join(UPLOAD_FOLDER, "output.txt")
+        criar_novo_arquivo_txt(txt_path, texto)
 
-        # Envia o arquivo Word para download
-        return send_file(word_path, as_attachment=True)
+        # Envia o arquivo TXT para download
+        return send_file(txt_path, as_attachment=True)
 
     return render_template("index.html")
 
-# Função para extrair texto da imagem
+# Função para extrair texto da imagem e colocar em uma única linha com quebras no ponto final
 def extrair_texto_da_imagem(caminho_imagem):
     imagem = Image.open(caminho_imagem)
+    # Usa o image_to_string para extrair o texto
     texto = pytesseract.image_to_string(imagem, lang='por', config='--psm 6')
-    return texto
 
-# Função para criar o arquivo Word
-def criar_novo_arquivo_word(caminho_saida, texto):
-    doc = Document()
+    # Concatena o texto em uma única linha, adicionando quebras no ponto final
+    texto_formatado = ""
     for linha in texto.split("\n"):
-        if linha.strip():  # Ignora linhas vazias
-            doc.add_paragraph(linha)
-    doc.save(caminho_saida)
+        texto_formatado += linha.strip() + " "
+
+    # Substitui pontos finais por ponto final + quebra de linha
+    texto_formatado = texto_formatado.replace(". ", ".\n")
+
+    return texto_formatado.strip()
+
+# Função para criar o arquivo TXT
+def criar_novo_arquivo_txt(caminho_saida, texto):
+    with open(caminho_saida, "w", encoding="utf-8") as arquivo:
+        arquivo.write(texto)
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
