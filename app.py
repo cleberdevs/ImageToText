@@ -6,6 +6,9 @@ import os
 
 app = Flask(__name__)
 
+# Configura o caminho do Tesseract
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
 # Pasta temporária para armazenar arquivos
 UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
@@ -59,4 +62,4 @@ def criar_novo_arquivo_word(caminho_saida, texto):
     doc.save(caminho_saida)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
