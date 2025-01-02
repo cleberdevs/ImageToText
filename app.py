@@ -4,6 +4,9 @@ import pytesseract
 from docx import Document
 import os
 
+# Configura a variável de ambiente para o Tesseract
+os.environ['TESSDATA_PREFIX'] = '/usr/share/tesseract-ocr/4.00/tessdata/'
+
 app = Flask(__name__)
 
 # Configura o caminho do Tesseract
