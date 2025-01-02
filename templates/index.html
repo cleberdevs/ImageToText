@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Imagem para Word</title>
+    <title>Conversor de Imagem para TXT</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Conversor de Imagem para Word</h1>
-        <p>Carregue uma imagem para converter o texto em um arquivo Word.</p>
+        <h1>Conversor de Imagem para TXT</h1>
+        <p>Carregue várias imagens para converter o texto em um único arquivo TXT.</p>
         <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".png,.jpg,.jpeg,.bmp,.tiff" required>
+            <input type="file" name="files" accept=".png,.jpg,.jpeg,.bmp,.tiff" multiple required>
             <button type="submit">Converter e Baixar</button>
         </form>
     </div>

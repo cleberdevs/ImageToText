@@ -20,29 +20,34 @@ if not os.path.exists(UPLOAD_FOLDER):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        # Verifica se um arquivo foi enviado
-        if "file" not in request.files:
+        # Verifica se os arquivos foram enviados
+        if "files" not in request.files:
             return "Nenhum arquivo enviado!", 400
 
-        file = request.files["file"]
+        files = request.files.getlist("files")
 
-        # Verifica se o arquivo tem um nome
-        if file.filename == "":
-            return "Nome do arquivo inválido!", 400
+        # Verifica se pelo menos um arquivo foi enviado
+        if not files or all(file.filename == "" for file in files):
+            return "Nenhum arquivo válido enviado!", 400
 
-        # Salva o arquivo temporariamente
-        image_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(image_path)
+        texto_total = ""
 
-        # Extrai o texto da imagem
-        try:
-            texto = extrair_texto_da_imagem(image_path)
-        except Exception as e:
-            return f"Erro ao extrair texto da imagem: {e}", 500
+        # Processa cada arquivo
+        for file in files:
+            # Salva o arquivo temporariamente
+            image_path = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(image_path)
+
+            # Extrai o texto da imagem
+            try:
+                texto = extrair_texto_da_imagem(image_path)
+                texto_total += texto + "\n"  # Adiciona o texto ao total
+            except Exception as e:
+                return f"Erro ao extrair texto da imagem {file.filename}: {e}", 500
 
         # Cria o arquivo TXT
         txt_path = os.path.join(UPLOAD_FOLDER, "output.txt")
-        criar_novo_arquivo_txt(txt_path, texto)
+        criar_novo_arquivo_txt(txt_path, texto_total)
 
         # Envia o arquivo TXT para download
         return send_file(txt_path, as_attachment=True)
